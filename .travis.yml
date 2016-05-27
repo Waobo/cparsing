@@ -1,0 +1,27 @@
+language: c
+
+env:
+  global:
+
+notifications:
+   email: 
+      - iljahoffmann@web.de
+
+script:  make
+
+compiler:
+  - clang
+  - gcc
+
+addons:
+  coverity_scan:
+
+     project:
+         name: Waobo/cparsing
+
+     notification_email: 
+        - iljahoffmann@web.de
+
+     build_command: make
+     branch_pattern: master
+
