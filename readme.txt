@@ -9,6 +9,13 @@ CONTENTS
 		-- Memory management
 
 
+NOTE: this is still work in progress. For example, the meta-parser does
+not know about some newer parsers and the C-parser never had a in-depth test
+and also still misses the typedef component -- even this readme is far 
+from complete. To make things worse, I'm working on this project very
+erratically. The currently available functionality is however already useful.
+
+
 MOTIVATION
 
 So, you code in C and that means that every time you open a file, receive
@@ -29,10 +36,6 @@ input data.
 
 Of course, this is of help only if the definition of the grammar isn't 
 even more complicate then writing all these tests and conversions by hand...
-
-Other than that, once you have context-free or context-sensitive languages
-as your input, you have no choice but to use or implement a full blown
-(recursive) parser (1).
 
 
 ABOUT
