@@ -1,0 +1,20 @@
+- don't forget terminating 0L on Sequence, Or or MatchAll
+
+- don't forget to Ref() properly, especially Record() and ForwardDeclaration() parser
+
+- don't use Restart(Record()); use Restart(Ref(Record())) instead 
+
+- don't declare a grammar with infinite recursion
+
+- declaration order within a grammar: a pattern-based parser may soak up input for a more specific parser - i.e:
+	Or(Word(ALPHANUM, 1, -1), Literal("foo"))
+  will always match on Word(), never reaching the Literal() parser
+  Rule of Thumb: put the most specific parser first
+
+- Optional() or ZeroOrMore() and the like at the beginning of a sequence: tends to terminate too early, because
+  a fail of the inner parser will actually result in a match _because_ the inner parser was optional.
+  Rule of Thumb: do not prefix mandatory parser with optional parsers (use explicit alternatives instead).
+
+- CaptureUntil() used with EXCLUDE_MATCH will result in a text position just before the excluded match.
+  This can lead to unexpected mismatches or even endless loops, if the previously excluded match is not
+  consumed by a following parser.
