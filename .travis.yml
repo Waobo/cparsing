@@ -2,6 +2,7 @@ language: c
 
 env:
   global:
+   - secure: "YWXj8sd6Jvrrjvcz78RIW/eIaiMt25ZrQWLW+ThUIRahcc614qPPoJE2YwA5j5DExXMzXJMheNYMxAeFRnUh9wbzjQ5/LWtXxV5xy3vPVfQpY8y3aJb4pc3zJAhJ+pNr9nmHHkiZXTOx3TQLrWucPDJmeWWrYf2GeQUxturMh+OaEyYLV2yKCc5YGQvmKtUSLVN1fJGtFeqcSL0iQABlPkTmsJNBw7bG/jw6DLXXNksMHOC9STQ2cpScHXrfOesm/+915QhKf6PiSFyi2E6nj7rQNPkNjWLO/KPAto2blvxTPKQhiBasAgBPPKizDubMqLeCECcsNAeQp6YQ3giRfWyPyOEyj0pRl7aGpyR9P/4vKLUco7lxerP9Znj9lFGP+zxucd+P1ASxM1ZcfIWT3Nw7ilSFeRDQDTaRs0eLKV9amptOkRdpc+/NYyThRBclAvJbOJqivhi9DQEIAVadqMibiUe+1U+momrAHRQI5pQvnG5sZ0ny2Ryfp/WIdC28QAULxLeXUG+Dv/Ak2sxYxMpaU0dA+hyGxxhA1TCyxpGed9XF3pMapjw13HCePTtmh+kLdJORgetqADL7pR3otHxHp50Dx0jsFTXxGRzKXVL3qhom1A54SUi0rf1DG1N2nZGFlZ656jOtnspkA96DMTDLBHUMGlUdUySgfyXSFmY="
 
 notifications:
    email: 
@@ -12,4 +13,17 @@ script:  make
 compiler:
   - clang
   - gcc
+
+addons:
+  coverity_scan:
+
+     project:
+         name: "Waobo/cparsing"
+         description: "A combinatoric recursive descent parser in C"
+
+     notification_email: 
+        - iljahoffmann@web.de
+
+     build_command: make
+     branch_pattern: master
 
