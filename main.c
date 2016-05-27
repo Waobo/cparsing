@@ -1698,7 +1698,6 @@ int main(void)
 
 	lldp_test();
 
-
 	cparsing_cleanup();
 	return 0;
 }
