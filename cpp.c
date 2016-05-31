@@ -144,7 +144,7 @@ Region tmp;
 
 	record_init_interator(&ri, data_source);
 
-	record_get_next(&ri, &name);
+	(void) record_get_next(&ri, &name);
 
 	if(record_get_next(&ri, &tmp))
 		result->arguments = (symbol_token *) tmp.begin;
@@ -211,15 +211,11 @@ Region _space = INIT_STR_REGION(" ");
 
 	record_init_interator(&ri, data_source);
 	// get symbols name ..
-	record_get_next(&ri, &name);
-
-printf("LU1: %p\n", symbols->get_value(symbols));
+	(void) record_get_next(&ri, &name);
 
 	// .. and lookup its definition
 	if(!dict_lookup(symbols, name.begin, (void **) &sym))
 		return EDIT_FAILED;
-
-printf("LU2: %p\n", sym);
 
 	if(has_arguments(sym))
 	{
@@ -227,17 +223,14 @@ printf("LU2: %p\n", sym);
 		substitutions = new_list_dict();
 		list_for_each(symbol_token, token, sym->arguments)
 		{
-		printf("."); print_ft(token->token.begin, token->token.end);
 			if(!record_get_next(&ri, &value))
 			{
 				printf("symbol '%s' missing parameters.\n", name.begin);
 				goto expand_symbol_out;
 			}
-		printf(":"), print_ft(value.begin, value.end);
 			substitutions->add(substitutions, &token->token, value.begin);
 		}
 	}
-	printf("\n");
 
 	// end of arguments.. so data_source has to be empty now
 	if(!record_iterator_at_end(&ri))
@@ -245,8 +238,6 @@ printf("LU2: %p\n", sym);
 		printf("bogus arguments found for symbol '%s'.\n", name.begin);
 		return EDIT_FAILED;
 	}
-
-	dump_ListDict(substitutions);
 
 	init_region(&after, "<empty>", 0L);
 	
@@ -264,16 +255,10 @@ printf("LU2: %p\n", sym);
 			)
 		);
 
-	printf("Binding: "); print_ft(sym->bindings.begin, sym->bindings.end); printf("\n");
+	// printf("Binding: "); print_ft(sym->bindings.begin, sym->bindings.end); printf("\n");
 
 	concret_replacement->parse(concret_replacement, I0, &sym->bindings);
 	
-	// parse_and_print_string_lol(&sym->bindings, concret_replacement);
-
-	printf("After substitution:\n");
-	print_ft(after.begin, after.end);
-	printf("\n");
-
 expand_symbol_out:
 	if(substitutions) substitutions->destroy(substitutions);
 
@@ -384,7 +369,7 @@ Region _space = INIT_STR_REGION(" ");
 
 	record_init_interator(&ri, data_source);
 	// get symbols name ..
-	record_get_next(&ri, &name);
+	(void) record_get_next(&ri, &name);
 
 	// .. and lookup its definition
 	if(!dict_lookup(symbols, name.begin, (void **) &sym))
@@ -414,7 +399,7 @@ Region _space = INIT_STR_REGION(" ");
 		return EDIT_FAILED;
 	}
 
-	dump_ListDict(substitutions);
+	//	if(substitutions) dump_ListDict(substitutions);
 
 	init_region(&after, "<empty>", 0L);
 	
@@ -455,7 +440,7 @@ static char *_space = " ";
 	{
 	printf("_concat_substituded_1\n");
 		record_init_interator(&ri, data_source);
-		record_get_next(&ri, &token);
+		(void) record_get_next(&ri, &token);
 		I.interpreter(data_source, I.param, TOKEN_VALUE, token.begin, token.end);
 
 		if(!record_get_next(&ri, &token))
@@ -475,7 +460,7 @@ static char *_space = " ";
 	{
 	printf("_concat_substituded_2\n");
 		record_init_interator(&ri, data_source);
-		record_get_next(&ri, &token);
+		(void) record_get_next(&ri, &token);
 
 		I.interpreter(data_source, I.param, TOKEN_VALUE, _space, _space);
 		I.interpreter(data_source, I.param, TOKEN_VALUE, token.begin, token.end);
@@ -497,7 +482,7 @@ static char *_quotes = "\"";
 	if(I.interpreter)
 	{
 		record_init_interator(&ri, data_source);
-		record_get_next(&ri, &expanded);
+		(void) record_get_next(&ri, &expanded);
 
 		I.interpreter(data_source, I.param, TOKEN_VALUE, _quotes, _quotes);
 		I.interpreter(data_source, I.param, TOKEN_VALUE, expanded.begin, expanded.end);

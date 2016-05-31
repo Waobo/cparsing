@@ -280,7 +280,44 @@ CARDINAL_CONVERTER_TO_CARDINAL(short,long)
 
 CARDINAL_CONVERTER_TO_CARDINAL(int,long)
 
+// Coverity reports CWE-570 for the following macro-expansions:
+// "Macro compares unsigned to 0 (NO_EFFECT) 
+// unsigned_compare: This less-than-zero comparison of an unsigned value is never true. len < 0UL.",
+// for which I fail to detect the cause. The code in comment below shows an exemplary expansion
+// (the preprocessor's output is similiar, just assert and errno being replaced). 
+
 CARDINAL_CONVERTER_FROM_STRING(str2byte,char,strtol)
+
+/*
+int str2byte(void *base_of_number, char **from, char **to)
+{
+long bt;
+int base;
+char value, *result;
+
+	assert(from && to && *from && *to);
+
+	bt = base_of_number ? (long) base_of_number : 10;
+	base = (int) bt;
+
+	value = strtol(*from, 0, base);
+
+	if(errno == ERANGE)
+	{
+		errno = 0;
+		return EDIT_FAILED;
+	}
+
+	result	= parse_malloc(sizeof(char));
+	*result	= value;
+	*from	= (char *) result;
+	*to		= ((char *) result) + sizeof(char) - 1;
+
+	return EDIT_OK;
+}
+*/
+
+
 CARDINAL_CONVERTER_TO_STRING(char2str,char,"%c")
 
 CARDINAL_CONVERTER_FROM_STRING(str2int,int,strtol)

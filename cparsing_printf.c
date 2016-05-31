@@ -353,6 +353,9 @@ RecordIterator ri;
 	format_component *new_fc = (format_component *) calloc(1, sizeof(format_component));
 	Typed *t = (Typed *) r.begin;
 
+		if(!new_fc)
+			return PARSER_FAILED;
+
 		switch(t->type)
 		{
 		case FMT_TEXT:

@@ -190,6 +190,7 @@ long size, rsize;
 			result->begin	= result->current = buffer;
 			result->end		= buffer + size - 1;
 
+			fclose(f);
 			return result;
 		}
 

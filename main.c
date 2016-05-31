@@ -1395,6 +1395,8 @@ int cb_dump_lldp_tlv(void *in, void **out)	// LLDPTLV *, unused
 LLDPTLV *tlv = *((LLDPTLV **) out);
 int i, dump_len, capped;
 
+	if(!tlv) return PARSER_FAILED;
+
 	printf("type %d -- len %d : ", tlv->type, tlv->len);
 	capped = (tlv->len > HEX_DATA_DUMP_LEN);
 	dump_len = (capped ? HEX_DATA_DUMP_LEN : tlv->len);

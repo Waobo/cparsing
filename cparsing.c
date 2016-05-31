@@ -120,6 +120,7 @@ int rc;
 		if(rc != 0)
 		{
 			perror("While trying to create thread specific storage:");
+			pthread_mutex_unlock(&local_storage_setup_mutex);
 			return 0;
 		}
 		pool_init_complete = 1;
@@ -214,9 +215,7 @@ void restore_runtime_pool(void *pool)
 {
 CParsingEnvironment *env = get_env();
 
-	assert(pool);
-	assert(env);
-	assert(env->runtime_pool);
+	assert(pool && env & env->runtime_pool);
 
 	// we need to free this pool before it is forgotten
 	if(env && pool)
@@ -230,8 +229,7 @@ void clear_runtime_pool(void)
 {
 CParsingEnvironment *env = get_env();
 
-	assert(env);
-	assert(env->runtime_pool);
+	assert(env && env->runtime_pool);
 
 	if(env && env->runtime_pool)
 		free_mem_pool(env->runtime_pool);
@@ -690,8 +688,8 @@ int cnt = 0;
 char c;
 
     assert(self);                                                                                       // Needs self-reference
-    assert(input && input->begin && input->end);                         // input must be valid
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // so that we gain a valid start (aka we dont parse empty input)
+	// input must be valid so that we gain a valid start (aka we dont parse empty input)
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
 
 	if(!(self && input))
 		return 0;
@@ -770,8 +768,6 @@ Parser *result	= parser();
 WordParam *p	= (WordParam *) calloc(1, sizeof(WordParam));
 unsigned char *cp = (unsigned char *) character_pool;
 
-	PNAME("Word")
-
     assert(character_pool);
     assert(p);
     assert("Word: minimum len must be > 0" && (min > 0));
@@ -787,6 +783,8 @@ unsigned char *cp = (unsigned char *) character_pool;
         p->mapping[*cp] = 1;
         ++cp;
     }
+
+	PNAME("Word")
 
     result->parse	= parse_Word;
     result->destroy	= destroy_parser_and_param;
@@ -867,10 +865,7 @@ int cnt = 0;
 
     p = (WordParam *) env->custom_whitespace ? env->custom_whitespace->param : spaces()->param;
 
-    assert(r);
-    assert(r->begin);
-    assert(r->current);
-    assert(r->end);
+    assert(r && r->begin && r->current && r->end);
     assert(p);
 
 	if(!( r && r->begin && r->current && r->end && p))
@@ -900,16 +895,14 @@ char *real_begin;
 char c;
 
     assert(self);                                                                                       // Needs self-reference
-    assert(input && input->begin && input->end);                         // input must be valid
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // so that we gain a valid start (aka we dont parse empty input)
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // needs valid start (aka we dont parse empty input)
 
-	if(!(self && input))
+	if(!(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) ))
 		return 0;
 
     string_to_match = (const char *) self->param;	// get our template-string
 
-    assert(string_to_match);
-    assert(*string_to_match);                       // we dont accept empty bottles
+    assert(string_to_match && *string_to_match);                       // we dont accept empty bottles
 
 	if(!(string_to_match && *string_to_match))		// and thus empty pattern will fail
 		return 0;
@@ -984,6 +977,7 @@ Parser *result;
 	}
 
 	result = parser();
+	if(!result) return NULL;
 
 	PNAME(string_to_match)
     result->parse	= parse_Literal;
@@ -1003,10 +997,9 @@ char *current_in_region;
 char c;
 
     assert(self);                                                                                       // Needs self-reference
-    assert(input && input->begin && input->end);                         // input must be valid
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // so that we gain a valid start (aka we dont parse empty input)
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // need valid start (aka we dont parse empty input)
 
-	if(!(self && input))
+	if(!(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) ))
 		return 0;
 
     region_to_match = (Region *) self->param;	// get our template-string
@@ -1138,8 +1131,7 @@ int escaped = 0;
 char quote, escape;
 
     assert(self);
-    assert(input && input->begin && input->end);
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
 
 	if(!(self && input))
 		return 0;
@@ -1338,15 +1330,13 @@ BaseParam *param;
 int result = PARSER_FAILED;
 
     assert(self);
-    assert(input);
-	assert(input->current);
+    assert(input && input->current);
 
 	if(!(self && input))
 		return result;
 
     param = (BaseParam *) self->param;
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 
 	if(!(param && param->parser))
 		return result;
@@ -1437,7 +1427,7 @@ BaseParam *param;
 Parser *Base2(int min_value, int max_value)
 {
     PARSER_BASE_INTRO
-    int is_signed           = 0;
+    const int is_signed           = 0;
 
     // we could calculate min and max len using logX(), but that would require libm
     // without adding real benefits, so we just read greedy and discard in interpreter
@@ -1464,7 +1454,7 @@ Parser *Base10(int min_value, int max_value, int is_signed)
 Parser *Base16(int min_value, int max_value)
 {
     PARSER_BASE_INTRO
-    int is_signed			= 0;
+    const int is_signed			= 0;
 
     param->parser			= Word(HEX, 1, -1);
     param->number_base		= 16;
@@ -1664,8 +1654,7 @@ int result = PARSER_FAILED;
 		return result;
 
 	param = self->param;
-    assert(param);
-	assert(param->getter);
+    assert(param && param->getter);
 	if(!(param && param->getter))
 		return result;
 	
@@ -1783,8 +1772,7 @@ static int interpreter_Bitfield(Parser *self, void *vparam, int mode, char *from
 BitfieldParam *param = (BitfieldParam *) vparam;
 
     assert(self);
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 
 	if(!(self && param && param->parser && from && to))
 		return PARSER_FAILED;
@@ -2043,12 +2031,10 @@ int current_match = 0, exact_match = 0;
 char *real_begin;
 char c;
 
-    assert(self);
-    assert(self->param);
-    assert(input && input->begin && input->end);                         // input must be valid
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // so that we gain a valid start (aka we dont parse empty input)
+    assert(self && self->param);
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );   // so that we gain a valid start (aka we dont parse empty input)
 
-	if(!(self && input))
+	if(!(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) ))
 		return 0;
 
     ADJUST_FLAGS
@@ -2615,9 +2601,7 @@ int result = PARSER_FAILED;
 		return 0;
 
     param = (DistributeParam *) self->param;
-    assert(param);
-	assert(param->source);
-	assert(param->receiver);
+    assert(param && param->source && param->receiver);
 
 	if(!(param && param->source && param->receiver))
 		return 0;
@@ -3062,8 +3046,7 @@ static int interpreter_Len(Parser *self, void *vparam, int mode, char *from, cha
 LenParam *param = (LenParam *) vparam;
 
     assert(self);
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 
 	if(!(self && param && param->parser && from && to))
 		return PARSER_FAILED;
@@ -3257,9 +3240,7 @@ int result = PARSER_FAILED;
 	if(!self) return result;
 
 	param = self->param;
-    assert(param);
-	assert(param->parser);
-	assert(param->getter);
+    assert(param && param->parser && param->getter);
 
 	if(!(param && param->parser && param->getter))
 		return result;
@@ -3553,16 +3534,14 @@ int result = PARSER_FAILED;
 
     param = (CaptureUntilParam *) self->param;
 
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 
 	if(!(param && param->parser))
 		return 0;
 
-    assert(input && input->begin && input->end);
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
 
-	if(!(self && input))
+	if(!(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) ))
 		return 0;
 
 	ADJUST_FLAGS
@@ -3700,12 +3679,10 @@ CaptureResults *capture;
 
     param = (CaptureUntilParam *) self->param;
 
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 	if(!(param && param->parser)) return PARSER_FAILED;
 
-    assert(input && input->begin && input->end && (input->begin <= input->end+1));
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
+    assert(input && input->begin && input->end && (input->begin <= input->end+1) && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)));
 
 	if(!(self && input))
 		return 0;
@@ -3745,8 +3722,7 @@ int result = PARSER_FAILED;
 
     param = (CaptureUntilParam *) self->param;
 
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 	if(!(param && param->parser)) return result;
 
     assert(input && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
@@ -4040,9 +4016,7 @@ int result = PARSER_FAILED;
 
     param = (NthParam *) self->param;
 
-    assert(param);
-    assert(param->parser);
-
+    assert(param && param->parser);
 	if(!(param && param->parser)) return 0;
 
     assert(input && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
@@ -4207,13 +4181,11 @@ int result = 0;
 
     param = (PackParam *) self->param;
 
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
 
 	if(!(param && param->parser)) return 0;
 
-    assert(input && input->begin && input->end);
-    assert(input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
+    assert(input && input->begin && input->end && input->current && (input->begin <= input->current) && (input->current <= (input->end+1)) );
 	if(!(self && input))
 		return 0;
 
@@ -4365,9 +4337,7 @@ static int interpreter_Edit(Parser *self, void *vparam, int mode, char *from, ch
 EditParam *param = (EditParam *) vparam;
 
     assert(self);
-    assert(param);
-    assert(param->recode);
-    assert(param->self);
+    assert(param && param->recode && param->self);
 	assert(from);
 	assert(to);
 
@@ -4442,8 +4412,7 @@ int result;
 
     param = (EditParam *) self->param;
 
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
     assert(input);
 	if(!(param && param->parser && input)) return 0;
 
@@ -4590,10 +4559,7 @@ static int interpreter_Put(Parser *self, void *vparam, int mode, char *from, cha
 PutParam *param = (PutParam *) vparam;
 
     assert(self);
-    assert(param);
-    assert(param->parser);
-    assert(param->target);
-    assert(param->size);
+    assert(param && param->parser && param->target && param->size);
 
 	if(!(self && param && param->parser && param->target && param->size))
 		return 0;
@@ -4665,8 +4631,7 @@ InterpreterInfo info;
 	if(!self) return 0;
 
     param = (PutParam *) self->param;
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
     assert(input);
 
 	if(!(param && param->parser && input)) return 0;
@@ -4746,8 +4711,7 @@ InterpreterInfo info;
 	if(!self) return 0;
 
     param = (PutParam *) self->param;
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
     assert(input);
 
 	if(!(param && param->parser && input)) return 0;
@@ -4826,8 +4790,7 @@ Region *r;
 	if(!self) return 0;
 
 	r = (Region *) self->param;
-	assert(r);
-	assert(r->begin && r->end && r->begin <= r->end);
+	assert(r && r->begin && r->end && r->begin <= r->end);
 	assert(input);
 
 	if(!(r && r->begin && r->end && r->begin <= r->end))
@@ -4945,9 +4908,7 @@ InterpreterInfo II;
 	if(!self) return 0;
 
     param = (CallParam *) self->param;
-    assert(param);
-    assert(param->parser);
-    assert(param->ctor);
+    assert(param && param->parser && param->ctor);
     assert(input);
 
 	if(!(param && param->parser && param->ctor && input))
@@ -5062,9 +5023,7 @@ OnFailParam *param;
 	if(!self) return result;
 
     param = (OnFailParam *) self->param;
-    assert(param);
-    assert(param->parser);
-    assert(param->error);
+    assert(param && param->parser && param->error);
     assert(input);
 
 	if(!(param && param->parser && param->error && input))
@@ -5138,8 +5097,7 @@ FailParam *param;
 	if(!self) return 0;
 
     param = (FailParam *) self->param;
-    assert(param);
-    assert(param->error);
+    assert(param && param->error);
     assert(input);
 	if(!(param && param->error && input)) return 0;
 
@@ -5235,9 +5193,7 @@ CaptureResults *capture;
 
     param = (ParserPairParam *) self->param;
 
-    assert(param);
-    assert(param->first_parser);
-    assert(param->second_parser);
+    assert(param && param->first_parser && param->second_parser);
 	if(!(param && param->first_parser && param->second_parser)) return result;
 
 	ADJUST_FLAGS
@@ -5358,8 +5314,7 @@ InterpreterInfo info;
 	if(!self) return result;
 
     param = (PrintParam *) self->param;
-    assert(param);
-    assert(param->parser);
+    assert(param && param->parser);
     assert(input);
 	if(!(param && param->parser && input)) return result;
 
@@ -5542,6 +5497,7 @@ Parser *result;
 
 	return result;
 }
+
 
 
 
