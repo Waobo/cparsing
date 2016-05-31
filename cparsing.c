@@ -967,8 +967,7 @@ Parser *Literal(char *string_to_match)
 {
 Parser *result;
 
-	assert(string_to_match);
-	assert(*string_to_match);
+	assert(string_to_match && *string_to_match);
 
 	if(!(string_to_match && *string_to_match))
 	{
