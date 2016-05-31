@@ -78,7 +78,8 @@ Currently this text is the main documentation for the lib. Other then that
 there is at least one commented example/test demonstrating the use of
 every component.
 
-Of course, the code of the library can also be examined..
+Of course, the code of the library can also be examined -- *main.c* i.e. holds
+some tests, that also demostrate the usage.
 
 This documentation assumes knowledge of the programming language C and its
 required tools.
