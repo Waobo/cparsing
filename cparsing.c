@@ -215,7 +215,7 @@ void restore_runtime_pool(void *pool)
 {
 CParsingEnvironment *env = get_env();
 
-	assert(pool && env & env->runtime_pool);
+	assert(pool && env && env->runtime_pool);
 
 	// we need to free this pool before it is forgotten
 	if(env && pool)
@@ -2914,7 +2914,6 @@ Parser *mark, *consumer;
 char *real_begin;
 int result = PARSER_FAILED;
 int current_result;
-int cnt = 0;
 
     assert(self);
 	if(!self) return PARSER_FAILED;
@@ -2978,8 +2977,6 @@ int cnt = 0;
             break;
         }
     }
-
-parse_Until_error_out:
 
 	TRACE_DEC
 
