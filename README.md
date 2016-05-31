@@ -84,7 +84,7 @@ This documentation assumes knowledge of the programming language C and its
 required tools.
 
 To use any of the functions and types below in your own code, you'll need to
-#include <cparsing.h> and link against libcparsing - there's no need to call an
+include <cparsing.h> and link against libcparsing - there's no need to call an
 init-function. 
 
 ###############################################################################
@@ -110,6 +110,7 @@ the basic data unit most other functions produce and/or consume.
 
 For a valid region, 'begin' and 'end' refer to the first and the last byte inclusively.
 
+```
 increasing memory addresses->
 -------------------------------
 |    |    |    |    |    |    |
@@ -117,6 +118,7 @@ increasing memory addresses->
    ^                        ^
    |                        |
  begin                     end
+```
 
 
 - for a region of one byte: 'begin' == 'end'.
