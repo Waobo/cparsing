@@ -286,9 +286,8 @@ CARDINAL_CONVERTER_TO_CARDINAL(int,long)
 // for which I fail to detect the cause. The code in comment below shows an exemplary expansion
 // (the preprocessor's output is similiar, just assert and errno being replaced). 
 
-CARDINAL_CONVERTER_FROM_STRING(str2byte,char,strtol)
+// CARDINAL_CONVERTER_FROM_STRING(str2byte,char,strtol)
 
-/*
 int str2byte(void *base_of_number, char **from, char **to)
 {
 long bt;
@@ -315,7 +314,6 @@ char value, *result;
 
 	return EDIT_OK;
 }
-*/
 
 
 CARDINAL_CONVERTER_TO_STRING(char2str,char,"%c")
