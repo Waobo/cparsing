@@ -18,6 +18,9 @@ and also still misses the typedef component -- even this readme is far
 from complete. To make things worse, I'm working on this project very
 erratically. The currently available functionality is however already useful.
 
+PS: You may find something like "..as explained in the API-Reference.." in 
+this text - this is currently an empty threat, as there is no such thing
+yet.
 
 MOTIVATION
 ----------
