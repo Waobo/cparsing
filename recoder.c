@@ -229,6 +229,7 @@ TYPE value, *result;\
 	}\
 \
 	result	= parse_malloc(sizeof(TYPE));\
+	if(!result) return EDIT_FAILED;\
 	*result	= value;\
 	*from	= (char *) result;\
 	*to		= ((char *) result) + sizeof(TYPE) - 1;\
@@ -239,7 +240,7 @@ TYPE value, *result;\
 #define CARDINAL_CONVERTER_TO_STRING(NAME,TYPE,FORMAT) int NAME(void *fmt, char **from, char **to)\
 {\
 char	*_fmt, *_str;\
-size_t	len;\
+int	len;\
 \
 	assert(from && *from && to && *to);\
 	assert((*to - *from) == sizeof(TYPE)-1);\
