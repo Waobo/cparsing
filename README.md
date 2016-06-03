@@ -380,10 +380,11 @@ also overwrite them specifically deeper down the definition.
 
 Here is the list of flags and their functions:
 
-	SKIP_TOKEN		- apply and check the parser but don't include the match as TOKEN_VALUE (*)
+	SKIP_TOKEN		- apply and check the parser but don't include the match as TOKEN_VALUE
 	IGNORE_CASE		- apply 'to lowercase' on input symbols before actual matching
 	DONT_SKIP_SPACES- supress automatic skipping of whitespaces
-	WEAK_MAX		- Repeat(): allow more than max occurances (but parse only up to max) - default is to fail if there are more than max occurances (*)
+	WEAK_MAX		- Repeat(): allow more than max occurances (but parse only up to max) 
+					- default is to fail if there are more than max occurances
 	TRACED          - print debug info about the parse-process
 	RESTART			- tells a stateful parser (i.e. Record) to reset itself
 
@@ -396,10 +397,11 @@ and this is a list of wrappers provided to manipulate these flags:
 	Parser *Strong(Parser *p);								// clear WEAK_MAX flag	(Print..)
 	Parser *Binary(Parser *p);								// set DONT_SKIP_SPACES flag
 	Parser *Traced(Parser *p);								// set TRACED flag
-	Parser *Named(char *name, Parser *p);					// a tool to set parser's name
 	Parser *Restart(Parser *p);								// set RESTART flag - ATTENTION: if applied to p itself, p will restart in every occurence - 
 															// which is probably not wanted (and may easily lead to endless loops); 
 															// however: using Restart(Ref(p)) will restart this occurence of p only and leave others unmodified
+	Parser *Named(char *name, Parser *p);					// not a flag, but a wrapper: a tool to set parser's name
+
 
 * Text vs. Binary mode
 -------------------
@@ -447,7 +449,7 @@ Here are some examples to that rule:
 	// --------------------------------------------------------------------------------------------
 	// *** ATTENTION *** THIS IS WRONG *** :
 	Parser *p = ...;                                    // any parser definition
-	Parsre *q = Sequence(p, p, ...);					
+	Parser *q = Sequence(p, p, ...);					
 	// WRONG: 2nd occurance of p without Ref
 	
 	// *** ATTENTION *** THIS IS WRONG *** :
@@ -507,6 +509,8 @@ Test for exact match of the given region\_to\_match; the provided region may not
 Matches a word made up by symbols of character\_pool with given minimal and maximal len. 
 Using -1 as minimum or maximum len means 'any len including zero'.
 
+Depending on the WEAK\_MAX flag, this parser either fails if there are more than 'max'
+matches (STRONG), or succeed after 'max' bytes leaving further matches in the input (WEAK).
 
 ---
 ### Parser \*CharNotIn(void \*character\_pool, int min, int max)
@@ -593,6 +597,8 @@ The parameter 'param' is passed through to the min\_max\_size\_getter function.
 Note: this parser and the more generic DynRepeat parser are mostly used with length
 information extracted out of the data that is being parsed.
 
+Depending on the WEAK\_MAX flag, this parser either fails if there are more than 'max'
+matches (STRONG), or succeed after 'max' bytes leaving further matches in the input (WEAK).
 
 ---
 ### Parser \*ElementOf(Dict \*dict);                              
@@ -650,6 +656,8 @@ Checks for min..max occurances of 'p' and fails if more os less are found.
 	OneOrMore(Parser *p) is equivalent to Repeat(p, 1, -1)
 	ZeroOrMore(Parser *p) is equivalent to Repeat(p, 0, -1)
 
+Depending on the WEAK\_MAX flag, this parser either fails if there are more than 'max'
+matches (STRONG), or succeed after 'max' bytes leaving further matches in the input (WEAK).
 
 ---
 ### Parser \*DynRepeat(Parser \*p, min\_max\_getter f, void \*vparam)
@@ -671,6 +679,8 @@ with
 
 As usual, a value of -1 means any amount of occurences including zero.
 
+Depending on the WEAK\_MAX flag, this parser either fails if there are more than 'max'
+matches (STRONG), or succeed after 'max' bytes leaving further matches in the input (WEAK).
 
 ---
 ### Parser \*MatchAll(Parser \*p1, ...)
