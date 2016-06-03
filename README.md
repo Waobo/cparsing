@@ -179,7 +179,7 @@ Lets declare a region or two:
 * Parser
 --------
 
-Basically, a parser gets a region as its input and outputs a boolean indicating wether the
+Basically, a parser gets a region as its input and outputs a boolean indicating whether the
 parser matches the region (aka 'accepts' the input) or not (rejects the input). If it did match,
 it also updates the 'current' of a region to the first byte after the match. Its pretty easy to
 extend the library with your own parsers btw.
@@ -257,14 +257,14 @@ the probably most often used combinator - the 'Sequence':
 * Interpreter
 -------------
 
-So far we have just tested wether a certain parser matches against some region, but we have done nothing
+So far we have just tested whether a certain parser matches against some region, but we have done nothing
 with the actual token that were identified during the parse run.
 
 To gain access to these token we provide the parse-run with an 'Interpreter' as the second argument
 of the call.
 
 The parser will call the interpreter when it becomes active, whenever it identifies
-a token and wether the parse succeeded or failed. 
+a token and whether the parse succeeded or failed. 
 
 In fact we did supply a special interpreter named 'I0', which just ignores all messages it receives.
 
