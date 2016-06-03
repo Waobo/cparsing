@@ -1,4 +1,4 @@
-# cparsing - a recusive descent parser library for C
+# cparsing - a recursive descent parser library for C
 
 CONTENTS
 --------
