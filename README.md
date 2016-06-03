@@ -470,7 +470,7 @@ problematic. Preprocessor definitions are of good use here:
 	// now we can use TUPEL in grammar definitions and are always getting
 	// everything fresh - no use of Ref() at all...
 
-Alas, some parsers require to be used in more then one place, i.e. ForwardDeclaration() or Record().
+Alas, some parsers require to be used in more than one place, i.e. ForwardDeclaration() or Record().
 
 ---
 ### Parser \*Ref(Parser \*p)
